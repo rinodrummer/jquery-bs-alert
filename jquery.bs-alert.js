@@ -15,7 +15,9 @@
             'alert-info',
             'alert-light',
             'alert-dark'
-        ]
+        ];
+
+        let close = '<button type="button" class="close" data-dismiss="alert" aria-label="' + opts.closeLabel + '"><span aria-hidden="true">&times;</span></button>';
 
         $.each(classes, function(index, className) {
            elem.removeClass(className);
@@ -38,8 +40,10 @@
 
         if (opts.dismissable) {
             if (!elem.children('button.close').length > 0) {
-                elem.append('<button type="button" class="close" data-dismiss="alert" aria-label="' + opts.closeLabel + '"><span aria-hidden="true">&times;</span></button>');
+                elem.append(close);
             }
+
+            close = elem.children('button.close');
 
             elem.contents().not('button.close').remove();
         }
@@ -51,12 +55,18 @@
         elem.addClass(opts.type);
         opts.show.call(this);
 
-        if (opts.autoDismiss) {
+        if (opts.autoDismiss && elem.is(':visible')) {
             setTimeout(function () {
                 opts.hide.call(that);
                 elem.trigger('close.bs.alert');
             }, dismissDelay);
         }
+
+        close.click(function (e) {
+            e.preventDefault();
+            opts.hide.call(that);
+            elem.trigger('close.bs.alert');
+        });
     }
 
     $.fn.bsAlert.defaults = {
