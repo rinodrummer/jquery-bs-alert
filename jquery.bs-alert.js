@@ -1,9 +1,9 @@
 (function ($) {
-    $.fn.bsAlert = function (options) {
+    $.fn.ajaxAlert = function (options) {
         let that = this;
         let elem = $(this);
 
-        let opts = $.extend( {}, $.fn.bsAlert.defaults, options);
+        let opts = $.extend( {}, $.fn.ajaxAlert.defaults, options);
 
         let dismissDelay = 0;
         let classes = [
@@ -51,7 +51,27 @@
             elem.contents().remove();
         }
 
-        elem.append('<p>' + opts.message + '</p>');
+        if (Array.isArray(opts.message)) {
+            if (opts.message['label'] && opts.message['label'].text) {
+                label = opts.message['label'];
+
+                label.tag = label.tag.toLowerCase() || 'p';
+
+
+                elem.append('<' + label.tag + '>' + label.text + (label.text.endsWith(':') ? '' : ':') + '</' + label.tag + '>');
+            }
+
+            let list = $('<ul></ul>');
+            elem.append(list);
+
+            message.each(function (index, message) {
+                list.append('<li>' + message + '</li>');
+            });
+        }
+        else {
+            elem.append('<p>' + opts.message + '</p>');
+        }
+
         elem.addClass(opts.type);
         opts.show.call(this);
 
@@ -62,14 +82,12 @@
             }, dismissDelay);
         }
 
-        close.click(function (e) {
-            e.preventDefault();
-            opts.hide.call(that);
-            elem.trigger('close.bs.alert');
-        });
+        if (opts.complete && $.isFunction(opts.complete)) {
+            opts.complete.call(that);
+        }
     }
 
-    $.fn.bsAlert.defaults = {
+    $.fn.ajaxAlert.defaults = {
         type: 'alert-success',
         message: '',
         dismissable: true,
@@ -80,6 +98,7 @@
         },
         hide: function () {
             $(this).fadeOut();
-        }
+        },
+        complete: null
     };
 })(jQuery);
