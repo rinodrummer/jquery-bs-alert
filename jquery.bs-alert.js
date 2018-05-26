@@ -51,9 +51,9 @@
             elem.contents().remove();
         }
 
-        if (Array.isArray(opts.message)) {
-            if (opts.message['label'] && opts.message['label'].text) {
-                label = opts.message['label'];
+        if (typeof opts.message === 'object') {
+            if (opts.message.label && opts.message.label.text) {
+                label = opts.message.label;
 
                 label.tag = label.tag.toLowerCase() || 'p';
 
@@ -64,7 +64,7 @@
             let list = $('<ul></ul>');
             elem.append(list);
 
-            message.each(function (index, message) {
+            opts.message.messages.each(function (index, message) {
                 list.append('<li>' + message + '</li>');
             });
         }
